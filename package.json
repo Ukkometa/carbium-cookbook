@@ -1,0 +1,23 @@
+{
+  "name": "carbium-cookbook",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Runnable examples for the Carbium Solana RPC and Swap API.",
+  "license": "MIT",
+  "homepage": "https://carbium.io/docs/",
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "rpc:first-call": "node --env-file=.env examples/rpc-first-call.mjs",
+    "rpc:balance": "node --env-file=.env examples/rpc-account-balance.mjs",
+    "rpc:blockhash": "node --env-file=.env examples/rpc-latest-blockhash.mjs",
+    "rpc:token-accounts": "node --env-file=.env examples/rpc-token-accounts.mjs",
+    "rpc:priority-fees": "node --env-file=.env examples/rpc-priority-fees.mjs",
+    "swap:quote": "node --env-file=.env examples/swap-quote.mjs",
+    "swap:quote-usd": "node --env-file=.env examples/swap-quote-usd.mjs",
+    "verify": "node --env-file=.env verify.mjs"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0"
+  }
+}

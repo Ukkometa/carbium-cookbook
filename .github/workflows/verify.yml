@@ -1,0 +1,33 @@
+# Runs every example against the live Carbium API.
+#
+# The value of this repo is that nothing in it is untested copy-paste, so a
+# broken example must fail here rather than in someone else's terminal.
+#
+# Requires two repository secrets (Settings → Secrets and variables → Actions):
+#   CARBIUM_RPC_KEY   RPC key  (sent as the ?apiKey= query parameter)
+#   CARBIUM_API_KEY   Swap key (sent as the X-API-KEY header) — a DIFFERENT key
+#
+# Use keys dedicated to CI with tight rate limits, not the ones you develop with.
+name: verify
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC — catches upstream drift weekly
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: node verify.mjs
+        env:
+          CARBIUM_RPC_KEY: ${{ secrets.CARBIUM_RPC_KEY }}
+          CARBIUM_API_KEY: ${{ secrets.CARBIUM_API_KEY }}
