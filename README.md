@@ -233,10 +233,11 @@ Because it is a Yellowstone-style stream, not standard Solana PubSub. Use
 `transactionSubscribe` with its two-element params array. See
 [`stream-transactions.mjs`](examples/stream-transactions.mjs).
 
-**Is `grpc.carbium.io` a WebSocket host or a gRPC host?**
-Both, on different transports. `wss://grpc.carbium.io/?apiKey=<key>` is the WebSocket
-stream and works. `https://grpc.carbium.io` with an `x-token` header is native
-Yellowstone gRPC over HTTP/2, which is gated to Business tier and above.
+**Why is the streaming host called `grpc` if I connect over WebSocket?**
+Because the *payload* is Yellowstone-style gRPC data, while the *transport* is WebSocket.
+Carbium serves this stream over `wss://grpc.carbium.io/?apiKey=<key>` — that is the
+supported path and what [`stream-transactions.mjs`](examples/stream-transactions.mjs)
+uses. Connect with a WebSocket client, not a native gRPC client.
 
 **What Node version does this require?**
 Node 20.12 or later, for native `--env-file` support.

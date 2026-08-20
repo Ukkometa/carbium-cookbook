@@ -10,9 +10,9 @@
  * Use `transactionSubscribe` with its two-element params array. Standard PubSub
  * names such as `slotSubscribe` return `-32601 Method not found` here.
  *
- * Note the host: `grpc.carbium.io` serves BOTH the WebSocket stream (this file,
- * over wss://) and native Yellowstone gRPC (over https:// with an `x-token`
- * header). They are different transports on one hostname.
+ * The host is called `grpc` because the payload is Yellowstone-style gRPC data.
+ * The transport is WebSocket: connect with a WebSocket client over wss://, not
+ * with a native gRPC client.
  *
  * No dependencies: Node 22 ships a global WebSocket. The published docs example
  * uses the `ws` package, which also works.
