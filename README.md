@@ -2,9 +2,9 @@
 
 [![verify](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml/badge.svg)](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml)
 
-7 runnable, continuously tested recipes for the **Carbium Solana RPC** and **Swap API**
-in Node.js. All 7 are executed against the live API before release. Last verified
-2026-08-20 against `solana-core 4.2.0` and `@solana/web3.js` v1.98.
+8 runnable, continuously tested recipes for the **Carbium Solana RPC** and **Swap API**
+in Node.js. All 8 are executed against the live API before release. Last verified
+2026-08-21 against `solana-core 4.2.0` and `@solana/web3.js` v1.98.
 
 **Docs:** https://carbium.io/docs/ · **RPC:** https://rpc.carbium.io/ · **Swap API:** https://api.carbium.io/
 
@@ -98,6 +98,34 @@ const slot = await connection.getSlot();
 console.log(`${(performance.now() - t0).toFixed(1)} ms`);
 ```
 
+## Streaming recipes
+
+### How do I stream Solana transactions in real time from Carbium?
+
+Open a WebSocket to `wss://grpc.carbium.io/?apiKey=<key>` and send
+`transactionSubscribe`. Measured ~117 notifications/second on a busy account.
+
+| Recipe | Method | Does |
+|---|---|---|
+| [`stream-transactions.mjs`](examples/stream-transactions.mjs) | `transactionSubscribe` | Live transaction stream filtered by account |
+
+```js
+const ws = new WebSocket(`wss://grpc.carbium.io/?apiKey=${process.env.CARBIUM_RPC_KEY}`);
+ws.onopen = () => ws.send(JSON.stringify({
+  jsonrpc: "2.0", id: 1, method: "transactionSubscribe",
+  params: [
+    { vote: false, failed: false, accountInclude: ["<account>"], accountExclude: [], accountRequired: [] },
+    { commitment: "confirmed", encoding: "jsonParsed", transactionDetails: "full",
+      showRewards: false, maxSupportedTransactionVersion: 0 },
+  ],
+}));
+```
+
+> **This is a Yellowstone-style stream, not standard Solana PubSub.** Method names like
+> `slotSubscribe` return `-32601 Method not found`. Use `transactionSubscribe`.
+
+Node 22 ships a global `WebSocket`, so no dependency is required.
+
 ## Swap API recipes
 
 Both are **read-only**. Getting a quote signs nothing and sends nothing.
@@ -190,7 +218,8 @@ Yes. 12 methods are verified against the live endpoint, including `getSlot`,
 
 **Can I use @solana/web3.js with Carbium?**
 Yes. Carbium is a standard Solana JSON-RPC endpoint — pass the URL to `new Connection()`.
-All 7 recipes use `@solana/web3.js` v1.98.
+The 5 JSON-RPC recipes use `@solana/web3.js` v1.98. The streaming and Swap recipes use
+no dependencies at all — Node 22 has a global `WebSocket` and `fetch`.
 
 **Why should I never log the Carbium RPC URL?**
 The key travels in the query string, so the URL is itself a secret. Log
@@ -198,6 +227,16 @@ The key travels in the query string, so the URL is itself a secret. Log
 
 **Is getting a swap quote a transaction?**
 No. `/quote` and `/quote-usd` are read-only HTTP GETs. Nothing is signed or broadcast.
+
+**Why does `slotSubscribe` fail on the WebSocket endpoint?**
+Because it is a Yellowstone-style stream, not standard Solana PubSub. Use
+`transactionSubscribe` with its two-element params array. See
+[`stream-transactions.mjs`](examples/stream-transactions.mjs).
+
+**Is `grpc.carbium.io` a WebSocket host or a gRPC host?**
+Both, on different transports. `wss://grpc.carbium.io/?apiKey=<key>` is the WebSocket
+stream and works. `https://grpc.carbium.io` with an `x-token` header is native
+Yellowstone gRPC over HTTP/2, which is gated to Business tier and above.
 
 **What Node version does this require?**
 Node 20.12 or later, for native `--env-file` support.
@@ -210,22 +249,23 @@ Node 20.12 or later, for native `--env-file` support.
 npm run verify
 ```
 
-Runs all 7 recipes against the live API and exits non-zero on any failure. Nothing in
+Runs all 8 recipes against the live API and exits non-zero on any failure. Nothing in
 this repo is untested copy-paste. CI re-runs it every Monday at 06:00 UTC to catch
-upstream drift. On 2026-08-20 all 7 passed, in 297–821 ms each.
+upstream drift. On 2026-08-21 all 8 passed, in 368–1296 ms each.
 
 ```
-Verifying 7 examples against the live API
+Verifying 8 examples against the live API
 
-  PASS  rpc-account-balance.mjs        357ms
-  PASS  rpc-first-call.mjs             551ms
-  PASS  rpc-latest-blockhash.mjs       748ms
-  PASS  rpc-priority-fees.mjs          436ms
-  PASS  rpc-token-accounts.mjs         551ms
-  PASS  swap-quote-usd.mjs             821ms
-  PASS  swap-quote.mjs                 451ms
+  PASS  rpc-account-balance.mjs        859ms
+  PASS  rpc-first-call.mjs             705ms
+  PASS  rpc-latest-blockhash.mjs       634ms
+  PASS  rpc-priority-fees.mjs          368ms
+  PASS  rpc-token-accounts.mjs         956ms
+  PASS  stream-transactions.mjs       1296ms
+  PASS  swap-quote-usd.mjs             510ms
+  PASS  swap-quote.mjs                 402ms
 
-✓ all examples passing
+✓ all 8 examples passing
 ```
 
 ## Security

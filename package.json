@@ -6,7 +6,9 @@
   "description": "Runnable examples for the Carbium Solana RPC and Swap API.",
   "license": "MIT",
   "homepage": "https://carbium.io/docs/",
-  "engines": { "node": ">=20.12" },
+  "engines": {
+    "node": ">=20.12"
+  },
   "scripts": {
     "rpc:first-call": "node --env-file=.env examples/rpc-first-call.mjs",
     "rpc:balance": "node --env-file=.env examples/rpc-account-balance.mjs",
@@ -15,7 +17,8 @@
     "rpc:priority-fees": "node --env-file=.env examples/rpc-priority-fees.mjs",
     "swap:quote": "node --env-file=.env examples/swap-quote.mjs",
     "swap:quote-usd": "node --env-file=.env examples/swap-quote-usd.mjs",
-    "verify": "node --env-file=.env verify.mjs"
+    "verify": "node --env-file=.env verify.mjs",
+    "stream": "node --env-file=.env examples/stream-transactions.mjs"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.0"
