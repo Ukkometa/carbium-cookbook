@@ -18,7 +18,8 @@
     "swap:quote": "node --env-file=.env examples/swap-quote.mjs",
     "swap:quote-usd": "node --env-file=.env examples/swap-quote-usd.mjs",
     "verify": "node --env-file=.env verify.mjs",
-    "stream": "node --env-file=.env examples/stream-transactions.mjs"
+    "stream": "node --env-file=.env examples/stream-transactions.mjs",
+    "swap:cycles": "node --env-file=.env examples/swap-cycle-scanner.mjs"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.0"
