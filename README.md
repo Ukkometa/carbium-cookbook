@@ -6,7 +6,7 @@
 in Node.js. All 9 are executed against the live API before release. Last verified
 2026-08-21 against `solana-core 4.2.0` and `@solana/web3.js` v1.98.
 
-**Docs:** https://carbium.io/docs/ · **RPC:** https://rpc.carbium.io/ · **Swap API:** https://api.carbium.io/
+**Page:** https://www.carbium.io **Docs:** https://carbium.io/docs/ · **RPC:** https://rpc.carbium.io/ · **Swap API:** https://api.carbium.io/
 
 ---
 
