@@ -1,43 +1,58 @@
 /**
  * Carbium Swap API — get a swap quote
  *
- * Endpoint:  https://api.carbium.io/api/v2/quote
- * Auth:      X-API-KEY header
- * Docs:      https://carbium.io/docs/
+ * Endpoint:  https://services.carbium.sh   (JSON-RPC method `quote`)
+ * Auth:      your carbium.sh key in the `x-api-key` header
+ * Docs:      https://carbium.io/docs/quick-start-dex-api
  *
- * The Swap API key is SEPARATE from the RPC key. Issued independently in the
- * dashboard; they are not interchangeable.
+ * Quotes use the same key as the RPC recipes. The account needs the Quote
+ * module: add it on https://carbium.sh under MODULES. Without it the call
+ * answers 403 with -32050.
  *
  * This is read-only. Getting a quote signs nothing and sends nothing.
  *
- *   CARBIUM_API_KEY=... node examples/swap-quote.mjs
+ *   CARBIUM_RPC_KEY=... node examples/swap-quote.mjs
  */
-const BASE = "https://api.carbium.io/api/v2";
+const ENDPOINT = "https://services.carbium.sh";
 
 const SOL = "So11111111111111111111111111111111111111112";
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
-const params = new URLSearchParams({
-  src_mint: SOL,
-  dst_mint: USDC,
-  amount_in: String(1_000_000_000), // 1 SOL, in lamports (9 decimals)
-  slippage_bps: "50", // 0.50%
+const res = await fetch(ENDPOINT, {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_RPC_KEY },
+  body: JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "quote",
+    params: [
+      {
+        src_mint: SOL,
+        dst_mint: USDC,
+        amount_in: String(1_000_000_000), // 1 SOL, in lamports (9 decimals)
+        slippage_bps: 50, // 0.50%
+      },
+    ],
+  }),
 });
 
-const res = await fetch(`${BASE}/quote?${params}`, {
-  headers: { "X-API-KEY": process.env.CARBIUM_API_KEY },
-});
+const { result: q, error } = await res
+  .json()
+  .catch(() => ({ error: { code: res.status, message: "the response was not JSON" } }));
 
-if (!res.ok) {
-  // Auth failures come back as clean JSON, e.g. 401 {"error":"API key missing"}
-  console.error(`✗ HTTP ${res.status} — ${await res.text()}`);
+if (error) {
+  // Refusals are JSON-RPC errors, e.g. 401 -32001 "unknown api key" or
+  // 403 -32050 "module not enabled for this account". Some arrive with HTTP 200,
+  // so check for `error`, not only the HTTP status.
+  console.error(`✗ HTTP ${res.status}, ${error.code}: ${error.message}`);
   process.exit(1);
 }
 
-const q = await res.json();
+const route = [...new Set(q.routePlan.map((leg) => leg.swapInfo.label))].join(", ");
 
 console.log(`in            1 SOL`);
 console.log(`out           ${(Number(q.destAmountOut) / 1e6).toFixed(6)} USDC`);
-console.log(`min received  ${(Number(q.destAmountOutMin) / 1e6).toFixed(6)} USDC`);
-console.log(`slippage      ${Number(q.slippage) / 100}%`);
-console.log(`price impact  ${q.priceImpactPct}%`);
+console.log(`min received  ${(Number(q.minAmountOut) / 1e6).toFixed(6)} USDC`);
+console.log(`slippage      ${q.slippageBps / 100}%`);
+console.log(`route         ${q.routePlan.length} leg(s) via ${route}`);
+console.log(`quote id      ${q.quoteId} (valid for 30 s)`);
