@@ -1,7 +1,7 @@
 /**
  * Carbium RPC — sample recent priority fees before sending a transaction
  *
- * Endpoint:  https://rpc-service.carbium.io/?apiKey=<CARBIUM_RPC_KEY>
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
  * Method:    getRecentPrioritizationFees
  * Docs:      https://carbium.io/docs/
  *
@@ -14,7 +14,7 @@
  */
 import { Connection, PublicKey } from "@solana/web3.js";
 
-const rpc = `https://rpc-service.carbium.io/?apiKey=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
 const connection = new Connection(rpc, "confirmed");
 
 const accounts = [new PublicKey("So11111111111111111111111111111111111111112")];

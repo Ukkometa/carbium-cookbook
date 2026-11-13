@@ -1,12 +1,12 @@
 /**
  * Carbium RPC — your first call (current slot + round-trip latency)
  *
- * Endpoint:  https://rpc-service.carbium.io/?apiKey=<CARBIUM_RPC_KEY>
- * Auth:      API key as a `apiKey` query parameter
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
+ * Auth:      your carbium.sh key as the `api-key` query parameter
+ *            (the `x-api-key` header works too)
  * Docs:      https://carbium.io/docs/
  *
- * Note rpc.carbium.io is the marketing site and does not accept JSON-RPC.
- * The RPC host is rpc-service.carbium.io.
+ * Get a key at https://carbium.sh. One key covers every recipe in this repo.
  *
  * Because the key travels in the query string, the connection URL is itself a
  * secret: build it from the key at runtime and only ever log `new URL(rpc).host`.
@@ -16,7 +16,7 @@
  */
 import { Connection } from "@solana/web3.js";
 
-const rpc = `https://rpc-service.carbium.io/?apiKey=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
 
 const connection = new Connection(rpc, "confirmed");
 

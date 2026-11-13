@@ -1,7 +1,7 @@
 /**
  * Carbium RPC — fetch a blockhash for building a transaction
  *
- * Endpoint:  https://rpc-service.carbium.io/?apiKey=<CARBIUM_RPC_KEY>
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
  * Methods:   getLatestBlockhash, getBlockHeight
  * Docs:      https://carbium.io/docs/
  *
@@ -14,7 +14,7 @@
  */
 import { Connection } from "@solana/web3.js";
 
-const rpc = `https://rpc-service.carbium.io/?apiKey=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
 const connection = new Connection(rpc, "confirmed");
 
 const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
