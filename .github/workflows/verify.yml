@@ -3,11 +3,12 @@
 # The value of this repo is that nothing in it is untested copy-paste, so a
 # broken example must fail here rather than in someone else's terminal.
 #
-# Requires two repository secrets (Settings → Secrets and variables → Actions):
-#   CARBIUM_RPC_KEY   RPC key  (sent as the ?apiKey= query parameter)
-#   CARBIUM_API_KEY   Swap key (sent as the X-API-KEY header) — a DIFFERENT key
+# Requires one repository secret (Settings → Secrets and variables → Actions):
+#   CARBIUM_RPC_KEY   a key from carbium.sh. One key covers every recipe.
+#                     The account needs the Quote module for the Swap API recipes.
 #
-# Use keys dedicated to CI with tight rate limits, not the ones you develop with.
+# Where the plan allows more than one key, use a key dedicated to CI, not the
+# one you develop with.
 name: verify
 
 on:
@@ -28,24 +29,20 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # Fail early and legibly when the repo has no secrets, rather than letting
+      # Fail early and legibly when the repo has no secret, rather than letting
       # every recipe skip and surfacing it as a generic exit 1.
-      - name: Check secrets are present
+      - name: Check the secret is present
         env:
-          RPC: ${{ secrets.CARBIUM_RPC_KEY }}
-          API: ${{ secrets.CARBIUM_API_KEY }}
+          KEY: ${{ secrets.CARBIUM_RPC_KEY }}
         run: |
-          missing=0
-          [ -z "$RPC" ] && { echo "::error::CARBIUM_RPC_KEY secret is not set"; missing=1; }
-          [ -z "$API" ] && { echo "::error::CARBIUM_API_KEY secret is not set"; missing=1; }
-          if [ "$missing" = "1" ]; then
-            echo "Add them under Settings → Secrets and variables → Actions."
-            echo "Use keys dedicated to CI with tight rate limits."
+          if [ -z "$KEY" ]; then
+            echo "::error::CARBIUM_RPC_KEY secret is not set"
+            echo "Add it under Settings → Secrets and variables → Actions."
+            echo "It must be a key from carbium.sh."
             exit 1
           fi
-          echo "both secrets present"
+          echo "secret present"
 
       - run: node verify.mjs
         env:
           CARBIUM_RPC_KEY: ${{ secrets.CARBIUM_RPC_KEY }}
-          CARBIUM_API_KEY: ${{ secrets.CARBIUM_API_KEY }}

@@ -5,7 +5,7 @@ Not code, but these carry real discovery weight. Set them in the GitHub UI
 
 ## Description
 
-> Runnable, continuously tested recipes for the Carbium Solana RPC and Swap API.
+> Runnable, continuously tested Solana recipes for Carbium RPC and the Carbium Swap API.
 
 "Solana" belongs here rather than in the repo name — the description is indexed
 and has far more search volume than "carbium" on its own.
@@ -25,8 +25,8 @@ Update these three places afterwards:
 
 - `README.md` — the CI badge URL and the `git clone` line
 - `package.json` — `repository` field, if one has been added by then
-- Repo secrets — `CARBIUM_RPC_KEY` and `CARBIUM_API_KEY` do NOT transfer,
-  re-add them, scoped to this repo only, never org-wide.
+- Repo secret: `CARBIUM_RPC_KEY` (a key from carbium.sh) does NOT transfer,
+  re-add it, scoped to this repo only, never org-wide.
 
 ---
 

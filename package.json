@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
-  "description": "Runnable examples for the Carbium Solana RPC and Swap API.",
+  "description": "Runnable Solana examples for Carbium RPC and the Carbium Swap API.",
   "license": "MIT",
   "homepage": "https://carbium.io/docs/",
   "engines": {
