@@ -2,8 +2,8 @@
 
 [![verify](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml/badge.svg)](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml)
 
-9 runnable, continuously tested recipes for the **Carbium Solana RPC** and **Swap API**
-in Node.js. All 9 are executed against the live API before release. Last verified
+8 runnable, continuously tested recipes for the **Carbium Solana RPC** and **Swap API**
+in Node.js. All 8 are executed against the live API before release. Last verified
 2026-08-21 against `solana-core 4.2.0` and `@solana/web3.js` v1.98.
 
 **Page:** https://www.carbium.io **Docs:** https://carbium.io/docs/ · **RPC:** https://rpc.carbium.io/ · **Swap API:** https://api.carbium.io/
@@ -126,47 +126,6 @@ ws.onopen = () => ws.send(JSON.stringify({
 
 Node 22 ships a global `WebSocket`, so no dependency is required.
 
-### How do I find arbitrage opportunities with the Carbium Swap API?
-
-Carbium's router accepts the **same mint as both source and destination**. It then
-searches for a cycle — USDC → … → USDC — and returns what one round trip yields. That is
-a cyclic arbitrage query in a single call, instead of chaining two quotes and hoping the
-legs still agree with each other.
-
-| Recipe | Endpoints | Does |
-|---|---|---|
-| [`swap-cycle-scanner.mjs`](examples/swap-cycle-scanner.mjs) | `/quote` + `/quote-usd` | Scans same-mint cycles, sized in USD, net of transaction cost |
-
-```bash
-npm run swap:cycles          # defaults to $1,000 notional
-node --env-file=.env examples/swap-cycle-scanner.mjs 5000
-```
-
-#### A positive quote is not profit
-
-Two things decide whether a positive cycle is real, and the first one catches almost
-everyone.
-
-**Size.** Quotes are sized in *token units*, so a "profitable" cycle can be nothing but a
-rounding artifact on a dust trade. Measured on BONK:
-
-| Notional | Cycle Δ |
-|---|---|
-| ~$0.02 (1,000 BONK) | **+17 bps** |
-| $1,000 | **−1,076 bps** |
-
-Same cycle, same minute. The only thing that changed was size, and the "opportunity"
-inverted into a 10% loss. This is why the scanner sizes every cycle to a fixed USD
-notional via `/quote-usd` before comparing anything.
-
-**Cost.** A round trip must clear the transaction fee before it is worth anything, then
-survive slippage, competition from other bots, and the chance the route fails mid-flight.
-The scanner subtracts a transaction cost derived from live SOL price and a priority-fee
-assumption you can tune.
-
-A cycle that clears here is a **candidate worth investigating**, not a trade worth taking.
-The scanner signs nothing.
-
 ## Swap API recipes
 
 Both are **read-only**. Getting a quote signs nothing and sends nothing.
@@ -244,12 +203,6 @@ error. Filter by `mint` where possible — see
 
 ## FAQ
 
-**Can the Swap API quote the same token on both sides?**
-Yes. Passing the same mint as `src_mint` and `dst_mint` makes the router search for a
-cycle and return the round-trip result — a cyclic arbitrage query in one call. See
-[`swap-cycle-scanner.mjs`](examples/swap-cycle-scanner.mjs).
-
-
 **Do I need one API key or two?**
 Two. The RPC key and the Swap API key are issued separately in the Carbium dashboard and
 are not interchangeable. The RPC key goes in the URL query string; the Swap key goes in
@@ -297,12 +250,12 @@ Node 20.12 or later, for native `--env-file` support.
 npm run verify
 ```
 
-Runs all 9 recipes against the live API and exits non-zero on any failure. Nothing in
+Runs all 8 recipes against the live API and exits non-zero on any failure. Nothing in
 this repo is untested copy-paste. CI re-runs it every Monday at 06:00 UTC to catch
-upstream drift. On 2026-08-21 all 9 passed, in 353–5096 ms each.
+upstream drift. On 2026-08-21 all 8 passed, in 353–1365 ms each.
 
 ```
-Verifying 9 examples against the live API
+Verifying 8 examples against the live API
 
   PASS  rpc-account-balance.mjs        643ms
   PASS  rpc-first-call.mjs             583ms
@@ -310,11 +263,10 @@ Verifying 9 examples against the live API
   PASS  rpc-priority-fees.mjs          438ms
   PASS  rpc-token-accounts.mjs         925ms
   PASS  stream-transactions.mjs       1365ms
-  PASS  swap-cycle-scanner.mjs        5096ms
   PASS  swap-quote-usd.mjs             579ms
   PASS  swap-quote.mjs                 353ms
 
-✓ all 9 examples passing
+✓ all 8 examples passing
 ```
 
 ## Security
