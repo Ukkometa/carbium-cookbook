@@ -37,7 +37,7 @@ When the key travels in the query string, the connection URL is itself a secret.
 Build it at runtime and log only the host:
 
 ```js
-const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`;
 console.log(new URL(rpc).host); // "services.carbium.sh", without the query
 ```
 
@@ -46,7 +46,7 @@ To keep the key out of the URL, send it as a header instead:
 ```js
 const connection = new Connection("https://services.carbium.sh", {
   commitment: "confirmed",
-  httpHeaders: { "x-api-key": process.env.CARBIUM_RPC_KEY },
+  httpHeaders: { "x-api-key": process.env.CARBIUM_SH_KEY },
 });
 ```
 
@@ -60,7 +60,7 @@ API, so `@solana/web3.js` works unmodified:
 ```js
 import { Connection } from "@solana/web3.js";
 
-const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`;
 const connection = new Connection(rpc, "confirmed");
 
 const slot = await connection.getSlot();
@@ -125,7 +125,7 @@ busy account.
 | [`stream-transactions.mjs`](examples/stream-transactions.mjs) | `logsSubscribe` | Live stream of the transactions that touch one account |
 
 ```js
-const ws = new WebSocket(`wss://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`);
+const ws = new WebSocket(`wss://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`);
 ws.onopen = () => ws.send(JSON.stringify({
   jsonrpc: "2.0", id: 1, method: "logsSubscribe",
   params: [{ mentions: ["<account>"] }, { commitment: "confirmed" }],
@@ -165,7 +165,7 @@ a 1 SOL to USDC quote returned in 64–232 ms.
 ```js
 const res = await fetch("https://services.carbium.sh", {
   method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_RPC_KEY },
+  headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_SH_KEY },
   body: JSON.stringify({
     jsonrpc: "2.0", id: 1, method: "quote",
     params: [{

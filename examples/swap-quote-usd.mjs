@@ -13,7 +13,7 @@
  * The price table is cached for 30 s. In a real app, poll it on a timer rather
  * than calling it once per quote.
  *
- *   CARBIUM_RPC_KEY=... node examples/swap-quote-usd.mjs
+ *   CARBIUM_SH_KEY=... node examples/swap-quote-usd.mjs
  */
 const ENDPOINT = "https://services.carbium.sh";
 
@@ -25,7 +25,7 @@ let id = 0;
 const call = async (method, params) => {
   const res = await fetch(ENDPOINT, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_RPC_KEY },
+    headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_SH_KEY },
     body: JSON.stringify({ jsonrpc: "2.0", id: ++id, method, params: [params] }),
   });
   const { result, error } = await res

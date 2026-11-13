@@ -1,16 +1,16 @@
 /**
  * Carbium RPC — read a SOL balance and account metadata
  *
- * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_SH_KEY>
  * Methods:   getBalance, getAccountInfo
  * Docs:      https://carbium.io/docs/
  *
  *   npm install @solana/web3.js
- *   CARBIUM_RPC_KEY=... node examples/rpc-account-balance.mjs <address>
+ *   CARBIUM_SH_KEY=... node examples/rpc-account-balance.mjs <address>
  */
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
-const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`;
 const connection = new Connection(rpc, "confirmed");
 
 // Defaults to the wrapped SOL mint so the example runs with no arguments.

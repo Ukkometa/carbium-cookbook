@@ -25,7 +25,7 @@ Update these three places afterwards:
 
 - `README.md` — the CI badge URL and the `git clone` line
 - `package.json` — `repository` field, if one has been added by then
-- Repo secret: `CARBIUM_RPC_KEY` (a key from carbium.sh) does NOT transfer,
+- Repo secret: `CARBIUM_SH_KEY` (a key from carbium.sh) does NOT transfer,
   re-add it, scoped to this repo only, never org-wide.
 
 ---

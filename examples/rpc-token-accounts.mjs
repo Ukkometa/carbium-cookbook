@@ -1,7 +1,7 @@
 /**
  * Carbium RPC — list the SPL token accounts owned by a wallet
  *
- * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_SH_KEY>
  * Method:    getParsedTokenAccountsByOwner
  * Docs:      https://carbium.io/docs/
  *
@@ -14,13 +14,13 @@
  * Limits and credits: https://carbium.sh/docs
  *
  *   npm install @solana/web3.js
- *   CARBIUM_RPC_KEY=... node examples/rpc-token-accounts.mjs [owner] [mint|all]
+ *   CARBIUM_SH_KEY=... node examples/rpc-token-accounts.mjs [owner] [mint|all]
  */
 import { Connection, PublicKey } from "@solana/web3.js";
 
 const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
-const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`;
 const connection = new Connection(rpc, "confirmed");
 
 const owner = new PublicKey(

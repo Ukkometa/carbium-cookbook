@@ -15,7 +15,7 @@ import { join } from "node:path";
 const DIR = "examples";
 const files = readdirSync(DIR).filter((f) => f.endsWith(".mjs")).sort();
 
-const needs = () => "CARBIUM_RPC_KEY"; // one carbium.sh key covers every recipe
+const needs = () => "CARBIUM_SH_KEY"; // one carbium.sh key covers every recipe
 
 const run = (file) =>
   new Promise((resolve) => {
@@ -53,7 +53,7 @@ for (const file of files) {
 if (ran === 0) {
   // Never report green on a run that tested nothing — a skipped CI job with a
   // passing badge is worse than a failing one.
-  console.log("\n✗ nothing ran: no API key available. Set CARBIUM_RPC_KEY.\n");
+  console.log("\n✗ nothing ran: no API key available. Set CARBIUM_SH_KEY.\n");
   process.exit(1);
 }
 

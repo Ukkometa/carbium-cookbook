@@ -11,7 +11,7 @@
  *
  * This is read-only. Getting a quote signs nothing and sends nothing.
  *
- *   CARBIUM_RPC_KEY=... node examples/swap-quote.mjs
+ *   CARBIUM_SH_KEY=... node examples/swap-quote.mjs
  */
 const ENDPOINT = "https://services.carbium.sh";
 
@@ -20,7 +20,7 @@ const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
 const res = await fetch(ENDPOINT, {
   method: "POST",
-  headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_RPC_KEY },
+  headers: { "content-type": "application/json", "x-api-key": process.env.CARBIUM_SH_KEY },
   body: JSON.stringify({
     jsonrpc: "2.0",
     id: 1,

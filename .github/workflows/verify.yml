@@ -4,7 +4,7 @@
 # broken example must fail here rather than in someone else's terminal.
 #
 # Requires one repository secret (Settings → Secrets and variables → Actions):
-#   CARBIUM_RPC_KEY   a key from carbium.sh. One key covers every recipe.
+#   CARBIUM_SH_KEY   a key from carbium.sh. One key covers every recipe.
 #                     The account needs the Quote module for the Swap API recipes.
 #
 # Where the plan allows more than one key, use a key dedicated to CI, not the
@@ -33,10 +33,10 @@ jobs:
       # every recipe skip and surfacing it as a generic exit 1.
       - name: Check the secret is present
         env:
-          KEY: ${{ secrets.CARBIUM_RPC_KEY }}
+          KEY: ${{ secrets.CARBIUM_SH_KEY }}
         run: |
           if [ -z "$KEY" ]; then
-            echo "::error::CARBIUM_RPC_KEY secret is not set"
+            echo "::error::CARBIUM_SH_KEY secret is not set"
             echo "Add it under Settings → Secrets and variables → Actions."
             echo "It must be a key from carbium.sh."
             exit 1
@@ -45,4 +45,4 @@ jobs:
 
       - run: node verify.mjs
         env:
-          CARBIUM_RPC_KEY: ${{ secrets.CARBIUM_RPC_KEY }}
+          CARBIUM_SH_KEY: ${{ secrets.CARBIUM_SH_KEY }}

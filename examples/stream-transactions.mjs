@@ -1,7 +1,7 @@
 /**
  * Carbium RPC — stream Solana transactions in real time (WebSocket)
  *
- * Endpoint:  wss://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
+ * Endpoint:  wss://services.carbium.sh/?api-key=<CARBIUM_SH_KEY>
  * Auth:      your carbium.sh key as the `api-key` query parameter
  * Method:    logsSubscribe
  * Docs:      https://carbium.io/docs/solana-grpc
@@ -18,9 +18,9 @@
  * No dependencies: Node 22 ships a global WebSocket. The key travels in the
  * URL here, so never log the URL.
  *
- *   CARBIUM_RPC_KEY=... node examples/stream-transactions.mjs [account] [count]
+ *   CARBIUM_SH_KEY=... node examples/stream-transactions.mjs [account] [count]
  */
-const key = process.env.CARBIUM_RPC_KEY;
+const key = process.env.CARBIUM_SH_KEY;
 
 // Defaults to a high-traffic account so the example returns in a second or two.
 const account = process.argv[2] ?? "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
@@ -88,6 +88,6 @@ ws.onmessage = (event) => {
 
 ws.onerror = () => {
   clearTimeout(timer);
-  console.error("✗ websocket error — check CARBIUM_RPC_KEY");
+  console.error("✗ websocket error — check CARBIUM_SH_KEY");
   process.exit(1);
 };

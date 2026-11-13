@@ -1,7 +1,7 @@
 /**
  * Carbium RPC — your first call (current slot + round-trip latency)
  *
- * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_RPC_KEY>
+ * Endpoint:  https://services.carbium.sh/?api-key=<CARBIUM_SH_KEY>
  * Auth:      your carbium.sh key as the `api-key` query parameter
  *            (the `x-api-key` header works too)
  * Docs:      https://carbium.io/docs/
@@ -12,11 +12,11 @@
  * secret: build it from the key at runtime and only ever log `new URL(rpc).host`.
  *
  *   npm install @solana/web3.js
- *   CARBIUM_RPC_KEY=... node examples/rpc-first-call.mjs
+ *   CARBIUM_SH_KEY=... node examples/rpc-first-call.mjs
  */
 import { Connection } from "@solana/web3.js";
 
-const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_RPC_KEY}`;
+const rpc = `https://services.carbium.sh/?api-key=${process.env.CARBIUM_SH_KEY}`;
 
 const connection = new Connection(rpc, "confirmed");
 
