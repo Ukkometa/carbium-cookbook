@@ -3,7 +3,18 @@
   "version": "1.0.0",
   "private": false,
   "type": "module",
-  "description": "Runnable Solana examples for Carbium RPC and the Carbium Swap API.",
+  "description": "Runnable Solana examples for Carbium RPC, Carbon Stream (Yellowstone gRPC) and the Carbium Swap API.",
+  "keywords": [
+    "solana",
+    "solana-rpc",
+    "grpc",
+    "yellowstone-grpc",
+    "geyser",
+    "websocket",
+    "web3js",
+    "carbium",
+    "carbon-stream"
+  ],
   "license": "MIT",
   "homepage": "https://carbium.io/docs/",
   "engines": {
@@ -18,9 +29,13 @@
     "swap:quote": "node --env-file=.env examples/swap-quote.mjs",
     "swap:quote-usd": "node --env-file=.env examples/swap-quote-usd.mjs",
     "verify": "node --env-file=.env verify.mjs",
-    "stream": "node --env-file=.env examples/stream-transactions.mjs"
+    "stream": "node --env-file=.env examples/stream-transactions.mjs",
+    "grpc:slots": "node --env-file=.env examples/grpc-slots.mjs",
+    "grpc:transactions": "node --env-file=.env examples/grpc-account-transactions.mjs",
+    "grpc:resume": "node --env-file=.env examples/grpc-resume-from-slot.mjs"
   },
   "dependencies": {
-    "@solana/web3.js": "^1.98.0"
+    "@solana/web3.js": "^1.98.0",
+    "@triton-one/yellowstone-grpc": "8.0.0"
   }
 }

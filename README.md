@@ -2,9 +2,10 @@
 
 [![verify](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml/badge.svg)](https://github.com/Ukkometa/carbium-cookbook/actions/workflows/verify.yml)
 
-8 runnable, continuously tested recipes for **Carbium RPC** and the **Carbium Swap API**
-in Node.js. All 8 are executed against the live service before release. Last verified
-2026-11-13 against `solana-core 4.4.1` and `@solana/web3.js` v1.98.
+11 runnable, continuously tested recipes for **Carbium RPC**, **Carbon Stream** (Solana
+gRPC) and the **Carbium Swap API** in Node.js. All 11 are executed against the live
+service before release. Last verified 2026-11-15 against `solana-core 4.4.1`,
+`@solana/web3.js` v1.98 and `@triton-one/yellowstone-grpc` 8.0.0.
 
 **Page:** https://www.carbium.io **Docs:** https://carbium.io/docs/ · **RPC:** https://rpc.carbium.io/ · **Swap API:** https://api.carbium.io/ · **Keys:** https://carbium.sh
 
@@ -138,13 +139,65 @@ ws.onopen = () => ws.send(JSON.stringify({
 
 Node 22 ships a global `WebSocket`, so no dependency is required.
 
+## Carbon Stream recipes (Solana gRPC)
+
 ### What is Carbon Stream?
 
-**Carbon Stream** is Carbium's Yellowstone gRPC stream at `https://services.carbium.sh:9443`.
-It carries full transactions, accounts, slots and blocks with filters applied on the
-server. The same key works there as `x-token` metadata, on a Dev plan or above with the
-gRPC scope turned on for the key. Setup and a client are in
-[Solana gRPC Streaming with Carbium](https://carbium.io/docs/solana-grpc).
+**Carbon Stream** is Carbium's Solana gRPC stream, Yellowstone-compatible, at
+`https://services.carbium.sh:9443`. It carries full transactions, accounts, slots and
+blocks with filters applied on the server. The same key works there as `x-token`
+metadata, on a Dev plan or above with the gRPC scope turned on for the key (carbium.sh,
+Keys, SCOPE). More in [Solana gRPC Streaming with Carbium](https://carbium.io/docs/solana-grpc).
+
+| Recipe | Filter | Does |
+|---|---|---|
+| [`grpc-slots.mjs`](examples/grpc-slots.mjs) | `slots` | First stream: confirmed slots as they arrive. If it runs, key, plan and scope are in order |
+| [`grpc-account-transactions.mjs`](examples/grpc-account-transactions.mjs) | `transactions` with `accountInclude` | Every transaction that touches an account, with status, fee and SOL balance change |
+| [`grpc-resume-from-slot.mjs`](examples/grpc-resume-from-slot.mjs) | `slots` with `fromSlot` | Replays recent slots after a disconnect and catches up with the live edge |
+
+### How do I stream Solana data over gRPC with Carbium?
+
+Use any Yellowstone gRPC client with the endpoint and your key. These recipes use
+`@triton-one/yellowstone-grpc` 8.0.0. Put every filter in the first request: filters
+cannot change once the stream is open.
+
+```js
+import Client, { CommitmentLevel } from "@triton-one/yellowstone-grpc";
+
+const client = new Client("https://services.carbium.sh:9443", process.env.CARBIUM_SH_KEY, {
+  grpcMaxDecodingMessageSize: 64 * 1024 * 1024, // frames can be several MiB
+});
+await client.connect();
+
+const stream = await client.subscribe({
+  accounts: {}, slots: {}, transactionsStatus: {}, blocks: {}, blocksMeta: {}, entry: {},
+  accountsDataSlice: [], blockFooter: {},          // every map must be present
+  commitment: CommitmentLevel.CONFIRMED,
+  transactions: { watched: { accountInclude: ["<account>"], accountExclude: [], accountRequired: [], vote: false } },
+});
+stream.on("data", (update) => update.transaction && console.log(update.transaction.slot));
+```
+
+In one run on 2026-11-15, the first confirmed slot arrived 589 ms after the script
+started (connection included), five transactions touching the USDC mint arrived within
+0.1 s, and a resume from 20 slots back replayed 22 slots and reached the live edge in
+116 ms.
+
+### How do I follow a wallet's transactions over gRPC?
+
+Subscribe `transactions` with `accountInclude: [wallet]`, as
+[`grpc-account-transactions.mjs`](examples/grpc-account-transactions.mjs) does with a
+wallet address as its first argument. Plain SOL wallets do not arrive as account
+updates, so read the balance change from each transaction's `preBalances` and
+`postBalances`. There is no startup snapshot: load current state over RPC first.
+
+### How do I resume a Solana gRPC stream after a disconnect?
+
+Call `subscribeReplayInfo()` to learn where the server's replay window starts, then open
+a new stream with `fromSlot` set to the last slot you processed (never below
+`firstAvailable`), at processed commitment. Replay can start a slot early and overlap
+what you have, so dedupe transactions on `(slot, signature)`. See
+[`grpc-resume-from-slot.mjs`](examples/grpc-resume-from-slot.mjs).
 
 ## Swap API recipes
 
@@ -185,7 +238,23 @@ turn a quote into a transaction for your own wallet to sign, continue with the
 
 ---
 
+## Use with AI agents
+
+[`skills/carbium/SKILL.md`](skills/carbium/SKILL.md) is an agent skill: copy the
+`skills/carbium` folder into your agent's skills directory. It holds the endpoints, the
+auth forms and the rules that save a failed call, and points to
+[carbium.sh/skill.md](https://carbium.sh/skill.md), the live reference with every limit,
+error and price.
+
+---
+
 ## Troubleshooting
+
+### `PERMISSION_DENIED` from Carbon Stream
+
+The key is on the free plan, or its gRPC scope is off. Carbon Stream needs a Dev plan or
+above. On carbium.sh, open Keys, press SCOPE on the key, select GRPC and save. A key made
+while the account was on the free plan has no gRPC scope until you add it.
 
 ### `405 Method Not Allowed` from rpc.carbium.io
 
@@ -254,8 +323,9 @@ Yes. 12 methods are verified against the live endpoint, including `getSlot`,
 
 **Can I use @solana/web3.js with Carbium?**
 Yes. Carbium is a standard Solana JSON-RPC endpoint. Pass the URL to `new Connection()`.
-The 5 JSON-RPC recipes use `@solana/web3.js` v1.98. The streaming and Swap API recipes
-use no dependencies at all: Node 22 has a global `WebSocket` and `fetch`.
+The 5 JSON-RPC recipes use `@solana/web3.js` v1.98, and the 3 Carbon Stream recipes use
+`@triton-one/yellowstone-grpc` 8.0.0. The WebSocket and Swap API recipes use no
+dependencies at all: Node 22 has a global `WebSocket` and `fetch`.
 
 **Why should I never log the Carbium RPC URL?**
 When the key travels in the query string, the URL is itself a secret. Log
@@ -270,6 +340,12 @@ Yes. `wss://services.carbium.sh` serves the standard Solana PubSub methods. It d
 serve `transactionSubscribe`. To follow the transactions that touch an account, use
 `logsSubscribe` with `mentions`. See
 [`stream-transactions.mjs`](examples/stream-transactions.mjs).
+
+**Which plan does Carbon Stream need?**
+Dev or above, with the gRPC scope on the key. A free key is refused `PERMISSION_DENIED`.
+Narrow filters (an account list, slots, transaction status) open on every paid plan;
+firehose filters are heavy and need a higher plan. Plans and limits are on
+[carbium.sh](https://carbium.sh).
 
 **Is the gRPC stream the same thing as the WebSocket?**
 No. The WebSocket at `wss://services.carbium.sh` speaks JSON. Carbon Stream at
@@ -288,23 +364,26 @@ for the global `WebSocket`.
 npm run verify
 ```
 
-Runs all 8 recipes against the live API and exits non-zero on any failure. Nothing in
+Runs all 11 recipes against the live API and exits non-zero on any failure. Nothing in
 this repo is untested copy-paste. CI re-runs it every Monday at 06:00 UTC to catch
-upstream drift. On 2026-11-13 all 8 passed, in 295–727 ms each.
+upstream drift. On 2026-11-15 all 11 passed, in 427–1226 ms each.
 
 ```
-Verifying 8 examples against the live API
+Verifying 11 examples against the live API
 
-  PASS  rpc-account-balance.mjs        703ms
-  PASS  rpc-first-call.mjs             654ms
-  PASS  rpc-latest-blockhash.mjs       727ms
-  PASS  rpc-priority-fees.mjs          472ms
-  PASS  rpc-token-accounts.mjs         352ms
-  PASS  stream-transactions.mjs        593ms
-  PASS  swap-quote-usd.mjs             628ms
-  PASS  swap-quote.mjs                 295ms
+  PASS  grpc-account-transactions.mjs   920ms
+  PASS  grpc-resume-from-slot.mjs      558ms
+  PASS  grpc-slots.mjs                1226ms
+  PASS  rpc-account-balance.mjs        856ms
+  PASS  rpc-first-call.mjs             778ms
+  PASS  rpc-latest-blockhash.mjs       780ms
+  PASS  rpc-priority-fees.mjs          665ms
+  PASS  rpc-token-accounts.mjs         427ms
+  PASS  stream-transactions.mjs        802ms
+  PASS  swap-quote-usd.mjs             801ms
+  PASS  swap-quote.mjs                 447ms
 
-✓ all 8 examples passing
+✓ all 11 examples passing
 ```
 
 ## Security

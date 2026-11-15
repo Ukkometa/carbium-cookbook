@@ -6,6 +6,8 @@
 # Requires one repository secret (Settings → Secrets and variables → Actions):
 #   CARBIUM_SH_KEY   a key from carbium.sh. One key covers every recipe.
 #                     The account needs the Quote module for the Swap API recipes.
+#                     The Carbon Stream recipes need a Dev plan or above and
+#                     the gRPC scope on the key.
 #
 # Where the plan allows more than one key, use a key dedicated to CI, not the
 # one you develop with.
